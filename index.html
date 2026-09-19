@@ -1,0 +1,642 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Campus Character Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:wght@600&display=swap">
+<style>
+:root{
+  --paper:#faf4e6; --paper-2:#f3e9d4; --white:#ffffff; --ink:#1b1a17; --ink-2:#55514a; --muted:#6e695f;
+  --hairline:#e2d6bc; --accent:#3d57a0; --accent-tint:#e4e9f7;
+  --serif:"IBM Plex Serif",Georgia,serif; --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif; --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{background:var(--paper);color:var(--ink)}
+body{font-family:var(--sans);font-size:16px;line-height:1.5;padding-inline:16px;padding-block:20px 48px}
+.wrap{max-width:1180px;margin:0 auto;display:grid;gap:24px}
+header{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:12px 24px;border-bottom:2px solid var(--ink);padding-bottom:16px}
+.eyebrow{font-family:var(--mono);font-size:13px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 6px;display:flex;align-items:center;gap:8px}
+.mark{display:block;width:22px;height:22px}
+h1{font-family:var(--serif);font-weight:600;font-size:clamp(30px,4.2vw,44px);line-height:1.05;letter-spacing:-.02em;margin:0;text-wrap:balance}
+.lede{margin:8px 0 0;color:var(--ink-2);max-width:60ch}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+button{font:inherit;cursor:pointer}
+.btn{font-family:var(--sans);font-weight:600;font-size:15px;border:2px solid var(--ink);border-radius:999px;padding:10px 18px;background:var(--white);color:var(--ink)}
+.btn.primary{background:var(--ink);color:var(--paper)}
+.btn:hover{background:var(--paper-2)} .btn.primary:hover{background:#34322c}
+.btn:disabled{opacity:.6;cursor:progress}
+.ghost{font-family:var(--mono);font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;background:none;border:0;color:var(--accent);padding:8px 0;text-decoration:underline;text-underline-offset:3px}
+:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+
+.main{display:grid;grid-template-columns:minmax(300px,380px) 1fr;gap:28px;align-items:start}
+.stage{position:sticky;top:calc(env(safe-area-inset-top,0px) + 16px);display:grid;gap:16px}
+.tile{background:var(--paper-2);border:2px solid var(--ink);border-radius:12px;padding:12px 12px 0;display:grid;justify-items:center;overflow:hidden}
+#figure svg{width:100%;max-width:300px;height:auto;display:block}
+.who{display:flex;align-items:center;gap:10px;padding:8px 0 12px;width:100%;border-top:1px solid var(--hairline);margin-top:4px}
+.who p{margin:0;font-weight:500}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.field{display:grid;gap:4px}
+.field label{font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.field select,.field input{font:inherit;font-size:15px;padding:9px 10px;border:2px solid var(--ink);border-radius:8px;background:var(--white);color:var(--ink);width:100%;min-width:0}
+.check{grid-column:1/-1;display:flex;gap:10px;align-items:center;font-size:15px;cursor:pointer}
+.check input{width:20px;height:20px;accent-color:var(--ink);margin:0}
+.hint{grid-column:1/-1;margin:-6px 0 0;font-size:13px;color:var(--muted)}
+.finish{display:grid;gap:10px}
+.finish .row{display:flex;gap:8px;flex-wrap:wrap}
+.descbox{background:var(--white);border:1px solid var(--hairline);border-radius:8px;padding:10px 12px;font-size:14px;color:var(--ink-2);margin:0}
+.desclabel{font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0 0 -4px}
+#status{min-height:1.5em;font-size:14px;color:var(--ink);margin:0}
+.howto{font-size:14px;color:var(--ink-2);margin:0;padding-left:1.2em}
+.howto li+li{margin-top:2px}
+
+.builder{min-width:0}
+[role=tablist]{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px}
+[role=tab]{font-family:var(--sans);font-weight:600;font-size:15px;padding:8px 14px;border-radius:999px;border:2px solid var(--ink);background:var(--white);color:var(--ink)}
+[role=tab][aria-selected=true]{background:var(--ink);color:var(--paper)}
+#panel{display:grid;gap:22px}
+.group{border:0;margin:0;padding:0;min-width:0}
+.group legend{display:flex;gap:10px;align-items:baseline;padding:0;margin-bottom:10px}
+.glabel{font-family:var(--serif);font-weight:600;font-size:20px;letter-spacing:-.01em}
+.gcur{font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.opts{display:grid;gap:10px}
+.opts.thumb{grid-template-columns:repeat(auto-fill,minmax(104px,1fr))}
+.opts.color{grid-template-columns:repeat(auto-fill,minmax(104px,1fr))}
+.opt{position:relative;display:grid;justify-items:center;align-content:start;gap:6px;cursor:pointer;border-radius:10px;padding:8px 10px;border:2px solid transparent;min-width:0}
+.opt input{position:absolute;opacity:0;width:1px;height:1px}
+.opt .oname{font-size:13px;line-height:1.25;text-align:center;color:var(--ink-2)}
+.opt.thumb .thumb{display:block;width:100%;aspect-ratio:1/1;max-width:100%;background:var(--white);border:1px solid var(--hairline);border-radius:8px;overflow:hidden}
+.opt.thumb .thumb svg{width:100%;height:100%;display:block}
+.swatch{width:40px;height:40px;border-radius:50%;background:var(--c);border:2px solid var(--ink)}
+.opt:hover{background:var(--paper-2)}
+.opt:has(input:checked){border-color:var(--accent);background:var(--accent-tint)}
+.opt:has(input:checked) .oname{color:var(--ink);font-weight:600}
+.opt:has(input:focus-visible){outline:3px solid var(--accent);outline-offset:2px}
+.randstep{border-top:1px solid var(--hairline);padding-top:6px}
+footer{font-size:13px;color:var(--muted);border-top:1px solid var(--hairline);padding-top:14px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 24px}
+.brand{display:inline-flex;align-items:center;gap:12px;color:var(--ink-2);text-decoration:none;font-size:14px;border-radius:6px}
+.brand:hover span{text-decoration:underline;text-underline-offset:3px}
+.brand img{display:block;height:58px;width:auto}
+
+@media (max-width:760px){
+  .main{grid-template-columns:1fr}
+  .stage{position:static}
+  #figure svg{max-width:210px}
+  .fields{grid-template-columns:1fr 1fr}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <header>
+    <div>
+      <p class="eyebrow"><img class="mark" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADEAAAAwCAYAAAC4wJK5AAAA1ElEQVR4nO3WMQ4BQRiG4XfWHAEncA6NRKKQKCS7pSM4iiMoCYVEIZFonMMJKLWCArVkd+X/M76nmmKL7y0mO5CAADCaHh7WQ8razHohsx5RB0V4oQgvFOGFIqRGAeB83I6th5TV7g7XESAjW1mPqUBvJzcU4YUivFCEFxEgENbWQ/5eADhN+gvrIWV15vsivs+56ZJqiiQutiK8UIQXivAiiYjXzy5QGO+QAHDZ5TfrIWW1Bsv4eTs1TJdUlMTFVoQXivBCEV4kEREBmtd7/Pah/NgTZIAU0cIdPPUAAAAASUVORK5CYII=" alt="" width="22" height="22">Campus Character Studio</p>
+      <h1>Make your character</h1>
+      <p class="lede">Choose how you look, what you carry, and your player number. Then download your character to your computer and use it in the game.</p>
+    </div>
+    <div class="actions">
+      <button type="button" class="btn" id="surprise">Surprise me</button>
+      <button type="button" class="btn" id="reset">Start over</button>
+    </div>
+  </header>
+
+  <div class="main">
+    <section class="stage" aria-label="Your character">
+      <div class="tile">
+        <div id="figure"></div>
+        <div class="who"><span id="badge"></span><p id="badge-text" aria-live="polite"></p></div>
+      </div>
+      <div class="fields">
+        <div class="field"><label for="number">Player number</label><select id="number"></select></div>
+        <div class="field"><label for="name">Your name (optional)</label><input id="name" type="text" autocomplete="given-name" maxlength="20" placeholder="e.g. Maya" aria-describedby="namehint"></div>
+        <label class="check" for="showname"><input type="checkbox" id="showname"> <span>Show my name on a tag under my character</span></label>
+        <p class="hint" id="namehint">Up to 20 characters. First name or what people call you works best.</p>
+      </div>
+      <div class="finish">
+        <p class="desclabel" id="desclabel">Alt text description</p>
+        <p class="descbox" id="desc" aria-labelledby="desclabel"></p>
+        <div class="row">
+          <button type="button" class="btn primary" id="download">Download image</button>
+          <button type="button" class="btn" id="copy">Copy alt text</button>
+        </div>
+        <p id="status" role="status"></p>
+        <ol class="howto">
+          <li>Add the downloaded image into the game.</li>
+          <li>Paste the alt text into the image's description.</li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="builder" aria-label="Choices">
+      <div role="tablist" id="tabs" aria-label="Steps"></div>
+      <div role="tabpanel" id="panel" tabindex="0"></div>
+    </section>
+  </div>
+  <footer><a class="brand" href="https://teachinginhighered.com/" target="_blank" rel="noopener"><span>Brought to you by</span><img src="data:image/png;base64,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" alt="Teaching in Higher Ed" width="120" height="46"></a><span>Your choices stay in this browser only. Nothing is uploaded.</span></footer>
+</div>
+<script>
+/* The Commons — figure renderer (port of the design-system generator). */
+const INK = "#1b1a17", PAPER = "#faf4e6", SW = 3;
+const SKIN = { s1: "#f4d3bd", s2: "#e8b894", s3: "#cf976e", s4: "#a8704a", s5: "#7e5236", s6: "#553425" };
+const HAIR = { black: "#221c1a", brown: "#4f3527", auburn: "#8e3b24", blonde: "#d9a54a", gray: "#a6a198", silver: "#dcd6cb", pink: "#ddb4ce", blue: "#5070bd" };
+const C = {
+  terracotta: "#c0664a", olive: "#7d7a3e", mustard: "#d9a441", dustypink: "#d9a6a0", cream: "#efe6d2",
+  indigo: "#5070bd", green: "#496b5a", brick: "#bf493c", ochre: "#8c631f", lilac: "#d996e3", denim: "#3f5a8a",
+  charcoal: "#4a4845", khaki: "#c9b48a", white: "#faf7f0", blush: "#ecc2b5", navy: "#2d3b5c",
+};
+const W = 180, H = 320, CX = 82, D = 64;
+const VIEW = { x: -22, y: -10, w: 224, h: 374 }; // full-figure frame with room for every body, item and wheel
+const BODIES = {
+  slim: { sh: 23, w: 19, hip: 20, leg: 14, lo: 10 },
+  average: { sh: 27, w: 24, hip: 24, leg: 17, lo: 13 },
+  broad: { sh: 33, w: 29, hip: 28, leg: 19, lo: 15 },
+  fuller: { sh: 30, w: 38, hip: 34, leg: 21, lo: 16 },
+};
+const SHAPES = ["circle", "triangle", "square", "diamond", "hexagon", "star"];
+const SYMCOLORS = [["indigo", "#5070bd", "#ffffff"], ["jelly bean", "#dc6046", INK], ["ronchi", "#ebb757", INK],
+  ["green", "#496b5a", PAPER], ["orchid", "#ddb4ce", INK], ["ink", INK, PAPER]];
+function symbol(n) {
+  const [cname, fill, txt] = SYMCOLORS[((n - 1) + Math.floor((n - 1) / 6)) % 6];
+  return { shape: SHAPES[(n - 1) % 6], cname, fill, txt };
+}
+const f1 = v => Math.round(v * 10) / 10;
+
+function badge(n, x, y, s) {
+  const { shape, fill, txt } = symbol(n), r = s / 2;
+  const o = `fill="${fill}" stroke="${INK}" stroke-width="2.4" stroke-linejoin="round"`;
+  let g, ty = y;
+  if (shape === "circle") g = `<circle cx="${x}" cy="${y}" r="${r}" ${o}/>`;
+  else if (shape === "triangle") { g = `<polygon points="${x},${f1(y - r * 1.05)} ${f1(x + r * 1.1)},${f1(y + r * .85)} ${f1(x - r * 1.1)},${f1(y + r * .85)}" ${o}/>`; ty = y + r * .32; }
+  else if (shape === "square") g = `<rect x="${f1(x - r * .92)}" y="${f1(y - r * .92)}" width="${f1(s * .92)}" height="${f1(s * .92)}" rx="${f1(s * .1)}" ${o}/>`;
+  else if (shape === "diamond") g = `<polygon points="${x},${f1(y - r * 1.12)} ${f1(x + r * 1.12)},${y} ${x},${f1(y + r * 1.12)} ${f1(x - r * 1.12)},${y}" ${o}/>`;
+  else if (shape === "hexagon") g = `<polygon points="${f1(x - r * .52)},${f1(y - r * .95)} ${f1(x + r * .52)},${f1(y - r * .95)} ${f1(x + r * 1.02)},${y} ${f1(x + r * .52)},${f1(y + r * .95)} ${f1(x - r * .52)},${f1(y + r * .95)} ${f1(x - r * 1.02)},${y}" ${o}/>`;
+  else {
+    const pts = [];
+    for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? r * .66 : r * 1.14; pts.push(`${f1(x + rr * Math.cos(a))},${f1(y + rr * Math.sin(a))}`); }
+    g = `<polygon points="${pts.join(" ")}" ${o}/>`; ty = y + r * .06;
+  }
+  const two = n >= 10;
+  let fs = s * (two ? .40 : .52);
+  if (two && ["triangle", "star", "diamond"].includes(shape)) fs = s * .34;
+  return g + `<text x="${x}" y="${f1(ty)}" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-weight="700" font-size="${f1(fs)}" fill="${txt}" text-anchor="middle" dominant-baseline="central">${n}</text>`;
+}
+const P = (d, fill, sw = SW) => `<path d="${d}" fill="${fill}" stroke="${INK}" stroke-width="${sw}" stroke-linejoin="round"/>`;
+function limb(pts, color, w) {
+  const d = "M" + pts.map(([x, y]) => `${f1(x)},${f1(y)}`).join(" L");
+  return `<path d="${d}" fill="none" stroke="${INK}" stroke-width="${w + 2 * SW}" stroke-linecap="round" stroke-linejoin="round"/>` +
+    `<path d="${d}" fill="none" stroke="${color}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round"/>`;
+}
+const dot = (x, y, r, fill) => `<circle cx="${f1(x)}" cy="${f1(y)}" r="${r}" fill="${fill}" stroke="${INK}" stroke-width="${SW}"/>`;
+const gT = (arr, dy) => dy ? `<g transform="translate(0 ${dy})">${arr.join("")}</g>` : arr.join("");
+
+function head(p, skin, hair) {
+  const out = [], hy = 58, hs = p.hair;
+  const sil = (ln, flare, flip) => {
+    if (flip) {
+      const L = `C${CX - 28},${ln - 34} ${CX - 27},${ln - 16} ${CX - 26},${ln - 10} Q${CX - 28},${ln - 2} ${CX - 37},${ln - 6} Q${CX - 32},${ln + 5} ${CX - 20},${ln + 1}`;
+      const R = `L${CX + 20},${ln + 1} Q${CX + 32},${ln + 5} ${CX + 37},${ln - 6} Q${CX + 28},${ln - 2} ${CX + 26},${ln - 10} C${CX + 27},${ln - 16} ${CX + 28},${ln - 34}`;
+      return P(`M${CX - 23},${hy - 20} C${CX - 29},${hy - 8} ${CX - 28},${hy + 10} ${CX - 28},${hy + 14} ${L} ${R} ${CX + 28},${hy + 14} C${CX + 28},${hy + 10} ${CX + 29},${hy - 8} ${CX + 23},${hy - 20} C${CX + 17},${hy - 33} ${CX - 17},${hy - 33} ${CX - 23},${hy - 20} Z`, hair);
+    }
+    return P(`M${CX - 23},${hy - 20} C${CX - 29},${hy - 8} ${CX - 28},${ln - 30} ${CX - 26 - flare},${ln - 4} Q${CX - 25 - flare},${ln + 2} ${CX - 18},${ln} L${CX + 18},${ln} Q${CX + 25 + flare},${ln + 2} ${CX + 26 + flare},${ln - 4} C${CX + 28},${ln - 30} ${CX + 29},${hy - 8} ${CX + 23},${hy - 20} C${CX + 17},${hy - 33} ${CX - 17},${hy - 33} ${CX - 23},${hy - 20} Z`, hair);
+  };
+  let back = "";
+  if (hs === "long") back = sil(122, 2);
+  else if (hs === "bob") back = sil(90, 1);
+  else if (hs === "flip") back = sil(92, 0, true);
+  const hatOn = p.hat && p.hat !== "none";
+  if (hs === "curly") [[-22, -14, 12], [-12, -26, 13], [4, -29, 13], [19, -21, 12], [25, -6, 10], [-26, 0, 10], [24, 8, 9], [-25, 12, 9]].forEach(([dx, dy, r]) => out.push(dot(CX + dx, hy + dy, r, hair)));
+  if (hs === "bun" && !hatOn) out.push(dot(CX + 2, hy - 34, 10, hair));
+  out.push(`<ellipse cx="${CX}" cy="${hy}" rx="21" ry="25" fill="${skin}" stroke="${INK}" stroke-width="${SW}"/>`);
+  const longish = ["long", "bob", "flip"].includes(hs);
+  if (!longish) {
+    [-1, 1].forEach(s => out.push(`<ellipse cx="${CX + s * 21}" cy="${hy + 3}" rx="4" ry="6" fill="${skin}" stroke="${INK}" stroke-width="2.5"/>`));
+    out.push(`<ellipse cx="${CX}" cy="${hy}" rx="21" ry="25" fill="none" stroke="${INK}" stroke-width="${SW}"/>`);
+  }
+  if (hs === "short") out.push(P(`M${CX - 22},${hy - 2} Q${CX - 24},${hy - 30} ${CX},${hy - 29} Q${CX + 24},${hy - 30} ${CX + 22},${hy - 4} Q${CX + 10},${hy - 16} ${CX - 6},${hy - 15} Q${CX - 16},${hy - 13} ${CX - 22},${hy - 2} Z`, hair));
+  else if (longish || hs === "bun") {
+    const hl = `C${CX + 19},${hy - 12} ${CX + 12},${hy - 17} ${CX + 6},${hy - 23} C${CX - 6},${hy - 18} ${CX - 17},${hy - 12} ${CX - 22},${hy + 4}`;
+    out.push(`<path d="M${CX - 22},${hy + 4} C${CX - 25},${hy - 18} ${CX - 14},${hy - 28} ${CX},${hy - 28} C${CX + 14},${hy - 28} ${CX + 25},${hy - 18} ${CX + 22},${hy - 2} ${hl} Z" fill="${hair}"/>`);
+    out.push(`<path d="M${CX + 22},${hy - 2} ${hl}" fill="none" stroke="${INK}" stroke-width="${SW}" stroke-linecap="round"/>`);
+    if (hs === "bun") out.push(`<path d="M${CX - 22},${hy + 4} C${CX - 25},${hy - 18} ${CX - 14},${hy - 28} ${CX},${hy - 28} C${CX + 14},${hy - 28} ${CX + 25},${hy - 18} ${CX + 22},${hy - 2}" fill="none" stroke="${INK}" stroke-width="${SW}"/>`);
+  } else if (hs === "curly") [[-12, -20, 9], [2, -23, 10], [15, -17, 9]].forEach(([dx, dy, r]) => out.push(dot(CX + dx, hy + dy, r, hair)));
+  else if (hs === "bald") [-1, 1].forEach(s => out.push(P(`M${CX + s * 21},${hy + 2} Q${CX + s * 23},${hy - 6} ${CX + s * 19},${hy - 10} L${CX + s * 17},${hy + 4} Z`, hair, 2)));
+  const fh = p.beard === true ? "full" : (p.beard || "none");
+  if (fh === "full") {
+    // follows the jaw from the sideburns to the chin; cheeks and mouth stay open
+    out.push(P(`M${CX - 21},${hy - 2} C${CX - 22},${hy + 16} ${CX - 13},${hy + 32} ${CX},${hy + 32} C${CX + 13},${hy + 32} ${CX + 22},${hy + 16} ${CX + 21},${hy - 2} ` +
+      `C${CX + 18},${hy + 8} ${CX + 15},${hy + 15} ${CX + 8},${hy + 21} Q${CX},${hy + 25} ${CX - 8},${hy + 21} C${CX - 15},${hy + 15} ${CX - 18},${hy + 8} ${CX - 21},${hy - 2} Z`, hair, 2.6));
+  }
+  if (fh === "full" || fh === "mustache")
+    out.push(P(`M${CX - 10},${hy + 15} Q${CX},${hy + 10} ${CX + 10},${hy + 15} Q${CX + 5},${hy + 18} ${CX},${hy + 16} Q${CX - 5},${hy + 18} ${CX - 10},${hy + 15} Z`, hair, 2.2));
+  out.push(`<circle cx="${CX - 8}" cy="${hy + 1}" r="2.2" fill="${INK}"/><circle cx="${CX + 8}" cy="${hy + 1}" r="2.2" fill="${INK}"/>`);
+  out.push(`<path d="M${CX + 1},${hy + 3} L${CX - 2},${hy + 11} L${CX + 2},${hy + 11}" fill="none" stroke="${INK}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`);
+  if (fh === "none") out.push(`<path d="M${CX - 5},${hy + 16} Q${CX},${hy + 19} ${CX + 5},${hy + 16}" fill="none" stroke="${INK}" stroke-width="2" stroke-linecap="round"/>`);
+  else out.push(`<path d="M${CX - 4},${hy + 20} Q${CX},${hy + 22} ${CX + 4},${hy + 20}" fill="none" stroke="${INK}" stroke-width="2" stroke-linecap="round"/>`);
+  const gl = p.glasses, glassesOut = [];
+  if (gl && gl !== "none") {
+    const tort = p.glasses_color === "tortoise";
+    // tortoiseshell frames get a thin ink edge underneath so they read on every skin tone
+    const frames = (gc, k) => {
+      if (gl === "rect") return `<rect x="${CX - 16}" y="${hy - 5}" width="14" height="11" rx="3" fill="none" stroke="${gc}" stroke-width="${2.6 + k}"/><rect x="${CX + 2}" y="${hy - 5}" width="14" height="11" rx="3" fill="none" stroke="${gc}" stroke-width="${2.6 + k}"/><path d="M${CX - 2},${hy - 1} L${CX + 2},${hy - 1}" stroke="${gc}" stroke-width="${2.6 + k}"/>`;
+      if (gl === "cateye") {
+        // lenses sweep up to a point at the outer top corners
+        const lens = s => `M${CX + s * 2.5},${hy - 5} L${CX + s * 12},${hy - 5} Q${CX + s * 16},${hy - 5} ${CX + s * 19.5},${hy - 10} Q${CX + s * 18.5},${hy + 1} ${CX + s * 14},${hy + 5} Q${CX + s * 9},${hy + 8} ${CX + s * 4.5},${hy + 5} Q${CX + s * 2},${hy + 1} ${CX + s * 2.5},${hy - 5} Z`;
+        return `<path d="${lens(-1)} ${lens(1)}" fill="none" stroke="${gc}" stroke-width="${2.6 + k}" stroke-linejoin="round"/><path d="M${CX - 2.5},${hy - 3} L${CX + 2.5},${hy - 3}" stroke="${gc}" stroke-width="${2.6 + k}"/>`;
+      }
+      if (gl === "browline") return `<path d="M${CX - 16},${hy - 3} Q${CX - 15},${hy + 8} ${CX - 9},${hy + 8} Q${CX - 3},${hy + 8} ${CX - 2},${hy - 3} M${CX + 2},${hy - 3} Q${CX + 3},${hy + 8} ${CX + 9},${hy + 8} Q${CX + 15},${hy + 8} ${CX + 16},${hy - 3}" fill="none" stroke="${INK}" stroke-width="1.8"/><path d="M${CX - 17},${hy - 6} L${CX - 1},${hy - 6} L${CX - 2},${hy - 1} L${CX - 16},${hy - 1} Z M${CX + 1},${hy - 6} L${CX + 17},${hy - 6} L${CX + 16},${hy - 1} L${CX + 2},${hy - 1} Z" fill="${gc}" stroke="${k ? INK : gc}" stroke-width="1.5" stroke-linejoin="round"/><path d="M${CX - 2},${hy - 4} L${CX + 2},${hy - 4}" stroke="${gc}" stroke-width="2.5"/>`;
+      return `<circle cx="${CX - 8}" cy="${hy + 1}" r="6.5" fill="none" stroke="${gc}" stroke-width="${2.5 + k}"/><circle cx="${CX + 8}" cy="${hy + 1}" r="6.5" fill="none" stroke="${gc}" stroke-width="${2.5 + k}"/><path d="M${CX - 1.5},${hy} L${CX + 1.5},${hy}" stroke="${gc}" stroke-width="${2.5 + k}"/>`;
+    };
+    if (tort && gl !== "browline") glassesOut.push(frames(INK, 2.2));
+    glassesOut.push(frames(tort ? C.ochre : INK, tort && gl === "browline" ? 1 : 0));
+  }
+  const hc = C[p.hat_color] || C.terracotta;
+  if (p.hat === "beanie") {
+    out.push(P(`M${CX - 23},${hy - 10} Q${CX - 22},${hy - 42} ${CX},${hy - 42} Q${CX + 22},${hy - 42} ${CX + 23},${hy - 10} Z`, hc));
+    out.push(`<rect x="${CX - 25}" y="${hy - 17}" width="50" height="11" rx="4" fill="${hc}" stroke="${INK}" stroke-width="${SW}"/>`);
+  } else if (p.hat === "cap") {
+    // seen from the front: domed crown with a centre seam and button, brim as a shallow crescent over the brow
+    out.push(P(`M${CX - 23},${hy - 11} Q${CX - 23},${hy - 38} ${CX},${hy - 38} Q${CX + 23},${hy - 38} ${CX + 23},${hy - 11} Z`, hc));
+    out.push(`<path d="M${CX},${hy - 37} L${CX},${hy - 16}" stroke="${INK}" stroke-width="1.8" opacity=".7"/>`);
+    out.push(`<circle cx="${CX}" cy="${hy - 38}" r="2.6" fill="${hc}" stroke="${INK}" stroke-width="2"/>`);
+    const brim = `M${CX - 27},${hy - 13} Q${CX},${hy - 19} ${CX + 27},${hy - 13} Q${CX + 25},${hy - 5} ${CX},${hy - 4} Q${CX - 25},${hy - 5} ${CX - 27},${hy - 13} Z`;
+    out.push(P(brim, hc));
+    out.push(`<path d="${brim}" fill="${INK}" opacity=".18"/>`);
+  }
+  out.push(...glassesOut); // glasses sit on top of any hat brim
+  return [back, out];
+}
+
+function legs(p, B, bottom, skin, shoe) {
+  const out = [], hipY = 178, ankY = 284, skirt = p.bottom_kind === "skirt";
+  const legc = skirt ? skin : bottom;
+  [[CX - B.lo, -2], [CX + B.lo, 2]].forEach(([x, dx]) => out.push(limb([[x, hipY], [x + dx, ankY]], legc, B.leg)));
+  [[CX - B.lo, -7], [CX + B.lo, 7]].forEach(([x, dx]) => out.push(P(`M${f1(x - 10 + dx * .3)},${ankY + 2} Q${x + dx},${ankY - 6} ${f1(x + 11 + dx * .8)},${ankY + 4} L${x + 13 + dx},${ankY + 13} L${f1(x - 11 + dx * .3)},${ankY + 13} Z`, shoe)));
+  if (skirt) { const h = B.hip; out.push(P(`M${CX - h - 2},168 L${CX + h + 2},168 L${CX + h + 12},246 Q${CX},252 ${CX - h - 12},246 Z`, bottom)); }
+  return out;
+}
+
+function lap(p, B, bottom, skin, shoe, by, frame) {
+  const out = [], h = B.hip + 3, skirt = p.bottom_kind === "skirt", lo = B.lo;
+  [-1, 1].forEach(s => out.push(limb([[CX + s * lo, by + 10], [CX + s * (lo + 2), 284]], skirt ? skin : bottom, B.leg - 1)));
+  [-1, 1].forEach(s => { const x = CX + s * (lo + 22); out.push(`<rect x="${x - 5}" y="281" width="10" height="20" rx="5" fill="${C.charcoal}" stroke="${INK}" stroke-width="2.5"/>`); });
+  out.push(`<rect x="${CX - lo - 18}" y="296" width="${2 * lo + 36}" height="6" rx="3" fill="${frame}" stroke="${INK}" stroke-width="2.5"/>`);
+  [-1, 1].forEach(s => out.push(`<path d="M${CX + s * (h + 6)},${by} L${CX + s * (lo + 14)},296" stroke="${INK}" stroke-width="7" stroke-linecap="round"/><path d="M${CX + s * (h + 6)},${by} L${CX + s * (lo + 14)},296" stroke="${frame}" stroke-width="3" stroke-linecap="round"/>`));
+  [-1, 1].forEach(s => { const x = CX + s * lo; out.push(P(`M${x - 10},286 Q${x},278 ${x + 11},287 L${x + 12},296 L${x - 11},296 Z`, shoe)); });
+  out.push(P(`M${CX - h},${by - 10} L${CX + h},${by - 10} Q${CX + h + 3},${by + 16} ${CX + h - 4},${by + 18} L${CX - h + 4},${by + 18} Q${CX - h - 3},${by + 16} ${CX - h},${by - 10} Z`, bottom));
+  if (!skirt) out.push(`<path d="M${CX},${by - 4} L${CX},${by + 16}" stroke="${INK}" stroke-width="2"/>`);
+  return out;
+}
+
+const esc = t => t.replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+// name tag under the feet: white pill, ink outline, ink text (17:1). Always inside the same frame.
+function nameTag(name) {
+  const t = name.trim(); if (!t) return "";
+  const avail = VIEW.w - 12, padX = 14;
+  let fs = 18; const est = len => t.length * 0.6 * len;
+  if (est(fs) + 2 * padX > avail) fs = Math.max(15, (avail - 2 * padX) / (t.length * 0.6));
+  const tw = est(fs), fit = tw + 2 * padX > avail;
+  const w = Math.min(avail, Math.max(64, tw + 2 * padX)), h = fs + 16, cx = VIEW.x + VIEW.w / 2, y = 324;
+  return `<rect x="${f1(cx - w / 2)}" y="${y}" width="${f1(w)}" height="${f1(h)}" rx="${f1(h / 2)}" fill="#ffffff" stroke="${INK}" stroke-width="2.5"/>` +
+    `<text x="${f1(cx)}" y="${f1(y + h / 2 + 1)}" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-weight="600" font-size="${f1(fs)}" fill="${INK}" text-anchor="middle" dominant-baseline="central"` +
+    (fit ? ` textLength="${f1(avail - 2 * padX)}" lengthAdjust="spacingAndGlyphs"` : "") + `>${esc(t)}</text>`;
+}
+let _fid = 0;
+function person(p, opts = {}) {
+  const skin = SKIN[p.skin], hair = HAIR[p.hair_color], top = C[p.top], bottom = C[p.bottom], shoe = C[p.shoes];
+  const B = BODIES[p.body], { sh, w: wa, hip } = B, maxw = Math.max(sh, wa * 1.02);
+  const seated = p.mobility === "wheelchair", cane = p.mobility === "cane";
+  let item = p.item; const n = p.n, inner = C[p.inner], frame = C[p.chair_color] || C.indigo;
+  const Ls = [CX - sh + 4, 106], Rs = [CX + sh - 4, 106];
+  const hangL = [Ls, [CX - maxw - 6, 178]], hangR = [Rs, [CX + maxw + 6, 178]];
+  let la, ra;
+  const GRIP = ["tote", "book", "folder", "laptop"];
+  let bookOneHand = false;
+  if (seated) {
+    la = [Ls, [CX - maxw - 6, 146], [CX - 22, 168]];
+    ra = [Rs, [CX + maxw + 17 + 12, 156]];
+  } else {
+    if (cane && item === "book") bookOneHand = true;
+    const poses = {
+      tote: [hangL, [Rs, [CX + maxw + 7, 178]]],
+      laptop: [hangL, [Rs, [CX + maxw + 13, 166]]],
+      book: bookOneHand ? [hangL, [Rs, [CX + maxw + 6, 146], [CX + 31, 156]]] : [[Ls, [CX - maxw - 5, 148], [CX - 25, 150]], [Rs, [CX + maxw + 5, 146], [CX + 25, 140]]],
+      messenger: [hangL, [Rs, [CX + maxw + 6, 176]]],
+      folder: [hangL, [Rs, [CX + maxw + 6, 146], [CX + 31, 156]]],
+      lanyard: [hangL, hangR],
+    };
+    [la, ra] = poses[item];
+  }
+  // upper body, back layer
+  const ub = [];
+  [la, ra].forEach(a => ub.push(limb(a, top, 11)));
+  ub.push(`<rect x="${CX - 7}" y="80" width="14" height="18" fill="${skin}" stroke="${INK}" stroke-width="${SW}"/>`);
+  const k = 1.12;
+  const torso = `M${CX - 10},91 C${CX - 22},92 ${CX - sh},97 ${CX - sh},112 Q${f1(CX - wa * k)},152 ${CX - hip},186 L${CX + hip},186 Q${f1(CX + wa * k)},152 ${CX + sh},112 C${CX + sh},97 ${CX + 22},92 ${CX + 10},91 Z`;
+  const tk = p.top_kind;
+  ub.push(P(torso, top));
+  if (tk === "blazer") { ub.push(P(`M${CX - 10},92 L${CX},142 L${CX + 10},92 Z`, inner)); ub.push(`<path d="M${CX},142 L${CX},186" stroke="${INK}" stroke-width="2.5"/>`); }
+  else if (tk === "cardigan") { ub.push(P(`M${CX - 10},94 L${CX},120 L${CX + 10},94 Z`, inner)); ub.push(`<path d="M${CX},120 L${CX},186" stroke="${INK}" stroke-width="${SW}"/>`); [134, 152, 170].forEach(y => ub.push(`<circle cx="${CX + 5}" cy="${y}" r="2" fill="${INK}"/>`)); }
+  else if (tk === "shirt") { ub.push(P(`M${CX - 11},93 L${CX},104 L${CX + 11},93 L${CX + 13},101 L${CX},110 L${CX - 13},101 Z`, top, SW - .5)); ub.push(`<path d="M${CX},108 L${CX},186" stroke="${INK}" stroke-width="2"/>`); }
+  else if (tk === "sweater") ub.push(`<path d="M${CX - 11},94 Q${CX},104 ${CX + 11},94" fill="none" stroke="${INK}" stroke-width="${SW}"/>`);
+  else ub.push(P(`M${CX - 10},94 Q${CX},102 ${CX + 10},94`, skin));
+  if (item === "messenger" && !seated) ub.push(limb([[CX - sh + 8, 97], [CX + maxw - 2, 170]], C.ochre, 5));
+  if (item === "lanyard") {
+    const light = ["white", "cream", "khaki", "blush", "dustypink", "mustard", "lilac"].includes(p.top);
+    const strap = light ? C.indigo : PAPER, sd = `M${CX - 9},96 L${CX},140 L${CX + 9},96`;
+    ub.push(`<path d="${sd}" fill="none" stroke="${INK}" stroke-width="7" stroke-linejoin="round" stroke-linecap="round"/><path d="${sd}" fill="none" stroke="${strap}" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>`); ub.push(badge(n, CX, 152, 34)); }
+  // upper body, front layer
+  const uf = [];
+  [la, ra].forEach(a => {
+    if (a.length === 3) {
+      const [[sx, sy], [ex, ey], [hx, hy]] = a, ux = ex + .3 * (sx - ex), uy = ey + .3 * (sy - ey);
+      uf.push(`<path d="M${f1(ex)},${f1(ey)} L${f1(hx)},${f1(hy)}" stroke="${INK}" stroke-width="${11 + 2 * SW}" stroke-linecap="round" fill="none"/>`);
+      uf.push(`<path d="M${f1(ux)},${f1(uy)} L${f1(ex)},${f1(ey)} L${f1(hx)},${f1(hy)}" stroke="${top}" stroke-width="11" stroke-linecap="round" stroke-linejoin="round" fill="none"/>`);
+    }
+  });
+  const hands = [la, ra].map(a => dot(a[a.length - 1][0], a[a.length - 1][1] + 2, 5.5, skin));
+  const grip = GRIP.includes(item) || seated;
+  if (!grip) uf.push(...hands);
+  if (seated) {
+    if (item !== "lanyard") {
+      const fill = { tote: C.cream, laptop: C.charcoal, book: C.green, folder: C.mustard, messenger: C.ochre }[item];
+      if (item === "tote") { uf.push(`<path d="M${CX - 12},146 Q${CX},124 ${CX + 12},146" fill="none" stroke="${INK}" stroke-width="${SW}"/>`); uf.push(P(`M${CX - 20},146 L${CX + 20},146 L${CX + 22},194 L${CX - 22},194 Z`, fill)); }
+      else uf.push(`<rect x="${CX - 24}" y="140" width="48" height="54" rx="4" fill="${fill}" stroke="${INK}" stroke-width="${SW}"/>`);
+      uf.push(badge(n, CX, 170, 34));
+    }
+  } else if (item === "tote") {
+    const [hx, hy] = ra[ra.length - 1];
+    uf.push(`<path d="M${hx - 10},${hy + 10} Q${hx},${hy - 12} ${hx + 10},${hy + 10}" fill="none" stroke="${INK}" stroke-width="${SW}"/>`);
+    uf.push(P(`M${hx - 22},${hy + 10} L${hx + 22},${hy + 10} L${hx + 25},${hy + 66} L${hx - 25},${hy + 66} Z`, C.cream));
+    uf.push(badge(n, hx, hy + 39, 34));
+  } else if (item === "laptop") {
+    const [hx, hy] = ra[ra.length - 1];
+    uf.push(`<rect x="${hx - 25}" y="${hy - 4}" width="46" height="60" rx="5" fill="${C.charcoal}" stroke="${INK}" stroke-width="${SW}" transform="rotate(-6 ${hx} ${hy})"/>`);
+    uf.push(badge(n, hx - 1, hy + 27, 34));
+  } else if (item === "book" && !bookOneHand) {
+    uf.push(`<rect x="${CX - 24}" y="118" width="48" height="58" rx="3" fill="${C.green}" stroke="${INK}" stroke-width="${SW}"/>`);
+    uf.push(badge(n, CX + 2, 146, 34));
+  } else if (item === "messenger") {
+    const bx = f1(CX + maxw - 3);
+    uf.push(P(`M${bx - 21},166 L${bx + 21},166 L${bx + 21},206 Q${bx},212 ${bx - 21},206 Z`, C.ochre));
+    uf.push(P(`M${bx - 21},166 L${bx + 21},166 L${bx + 21},184 L${bx - 21},184 Z`, C.ochre));
+    uf.push(badge(n, bx, 194, 32));
+  } else if (item === "folder" || bookOneHand) {
+    const fill = bookOneHand ? C.green : C.mustard;
+    uf.push(`<rect x="${CX - 20}" y="136" width="52" height="44" rx="3" fill="${fill}" stroke="${INK}" stroke-width="${SW}" transform="rotate(6 ${CX + 6} 158)"/>`);
+    uf.push(badge(n, CX + 6, 158, 34));
+  }
+  if (cane) {
+    const [hx, hy] = la[la.length - 1];
+    const d = `M${hx + 9},${hy + 6} Q${hx + 9},${hy - 6} ${hx},${hy - 4} L${hx - 3},300`;
+    uf.push(`<path d="${d}" fill="none" stroke="${INK}" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/><path d="${d}" fill="none" stroke="${C.ochre}" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>`);
+  }
+  if (grip) uf.push(...hands); else if (cane) uf.push(hands[0]);
+  const [hback, hd] = head(p, skin, hair);
+  let out = [];
+  if (!seated) out = [...legs(p, B, bottom, skin, shoe), hback, ...ub, ...uf, ...hd];
+  else {
+    const by = 186 + D, wo = maxw + 17, wy = by - 6, wh = 100;
+    const wheel = x => {
+      const s = x > CX ? 1 : -1;
+      return `<rect x="${f1(x - 7)}" y="${wy - wh / 2}" width="14" height="${wh}" rx="7" fill="${C.charcoal}" stroke="${INK}" stroke-width="${SW}"/>` +
+        `<path d="M${f1(x + s * 12)},${wy - wh / 2 + 16} L${f1(x + s * 12)},${wy + wh / 2 - 16}" stroke="${INK}" stroke-width="6" stroke-linecap="round"/><path d="M${f1(x + s * 12)},${wy - wh / 2 + 16} L${f1(x + s * 12)},${wy + wh / 2 - 16}" stroke="${frame}" stroke-width="2.5" stroke-linecap="round"/>`;
+    };
+    out.push(wheel(CX - wo), wheel(CX + wo));
+    const topY = 106 + D - 6;
+    out.push(P(`M${CX - sh - 3},${topY} L${CX + sh + 3},${topY} L${CX + sh + 3},${by} L${CX - sh - 3},${by} Z`, frame));
+    [-1, 1].forEach(s => out.push(`<circle cx="${CX + s * (sh + 3)}" cy="${topY - 2}" r="4.5" fill="${C.charcoal}" stroke="${INK}" stroke-width="2.5"/>`));
+    out.push(gT([hback, ...ub], D), ...lap(p, B, bottom, skin, shoe, by, frame), gT(uf, D), gT(hd, D));
+  }
+  const body = out.join("");
+  const tag = (opts.tag !== false && p.show_name !== false && p.name) ? nameTag(p.name) : "";
+  const vb = opts.viewBox || `${VIEW.x} ${VIEW.y} ${VIEW.w} ${VIEW.h}`;
+  const size = opts.width ? `width="${opts.width}" height="${opts.height}"` : "";
+  const label = opts.label ? `role="img" aria-label="${opts.label.replace(/"/g, "&quot;")}"` : `aria-hidden="true"`;
+  if (opts.grain === false) return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${vb}" ${size} ${label}>${body}${tag}</svg>`;
+  const fid = "grain" + (++_fid);
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${vb}" ${size} ${label}><defs><filter id="${fid}" filterUnits="userSpaceOnUse" x="${VIEW.x}" y="${VIEW.y}" width="${VIEW.w}" height="${VIEW.h}">` +
+    `<feTurbulence type="fractalNoise" baseFrequency="1.4" numOctaves="2" seed="${n * 7}" result="t"/>` +
+    `<feColorMatrix in="t" type="matrix" values="0 0 0 0 .11  0 0 0 0 .1  0 0 0 0 .09  0 0 0 2.4 -1.25" result="sp"/>` +
+    `<feComposite in="sp" in2="SourceAlpha" operator="in" result="sp2"/><feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="sp2"/></feMerge></filter></defs>` +
+    (opts.shadow === false ? "" : `<ellipse cx="${CX}" cy="${H - 12}" rx="46" ry="6" fill="${INK}" opacity=".12"/>`) +
+    `<g filter="url(#${fid})">${body}</g>${tag}</svg>`;
+}
+
+/* The Commons — character builder UI */
+const DEFAULT = {
+  n: 1, name: "", show_name: true, skin: "s5", body: "average", mobility: "standing",
+  hair: "flip", hair_color: "auburn", beard: "none",
+  glasses: "rect", glasses_color: "tortoise", hat: "none", hat_color: "terracotta",
+  top_kind: "sweater", top: "green", inner: "cream", bottom_kind: "pants", bottom: "khaki", shoes: "charcoal",
+  item: "tote", chair_color: "indigo",
+};
+const CLOTH_NAMES = {
+  terracotta: "Terracotta", olive: "Olive", mustard: "Mustard", dustypink: "Dusty pink", cream: "Cream", indigo: "Indigo",
+  green: "Green", brick: "Brick", ochre: "Ochre", lilac: "Lilac", denim: "Denim", charcoal: "Charcoal", khaki: "Khaki",
+  navy: "Navy", blush: "Blush", white: "White",
+};
+const clothOpts = keys => keys.map(k => ({ v: k, name: CLOTH_NAMES[k], color: C[k] }));
+const ALL_CLOTH = Object.keys(CLOTH_NAMES);
+const VB = { head: "30 4 104 104", face: "52 36 60 60", torso: "18 76 128 134", legs: "18 160 128 150", full: "-6 20 192 300" };
+
+const STEPS = [
+  { id: "body", label: "Body", groups: [
+    { key: "skin", label: "Skin tone", type: "color", opts: [["s1", "Very light"], ["s2", "Light"], ["s3", "Medium-light"], ["s4", "Medium"], ["s5", "Medium-dark"], ["s6", "Dark"]].map(([v, name]) => ({ v, name, color: SKIN[v] })) },
+    { key: "body", label: "Body shape", type: "thumb", vb: "full", opts: [["slim", "Slimmer"], ["average", "Average"], ["broad", "Broad"], ["fuller", "Fuller"]] },
+    { key: "mobility", label: "Getting around", type: "thumb", vb: "full", opts: [["standing", "Standing"], ["wheelchair", "Wheelchair"], ["cane", "Cane"]] },
+  ]},
+  { id: "hair", label: "Hair", groups: [
+    { key: "hair", label: "Style", type: "thumb", vb: "head", opts: [["short", "Short"], ["bob", "Bob"], ["flip", "Bob with a flip"], ["long", "Shoulder-length"], ["curly", "Curly"], ["bun", "Bun"], ["bald", "Bald"]] },
+    { key: "hair_color", label: "Color", type: "color", opts: [["black", "Black"], ["brown", "Brown"], ["auburn", "Auburn"], ["blonde", "Blonde"], ["gray", "Gray"], ["silver", "Silver"], ["pink", "Pink"], ["blue", "Blue"]].map(([v, name]) => ({ v, name, color: HAIR[v] })) },
+    { key: "beard", label: "Facial hair", type: "thumb", vb: "head", opts: [["none", "None"], ["mustache", "Mustache"], ["full", "Full beard"]] },
+  ]},
+  { id: "face", label: "Glasses & hats", groups: [
+    { key: "glasses", label: "Glasses", type: "thumb", vb: "face", opts: [["none", "None"], ["round", "Round"], ["rect", "Rectangular"], ["browline", "Browline"], ["cateye", "Cat-eye"]] },
+    { key: "glasses_color", label: "Frames", type: "color", when: s => s.glasses !== "none", opts: [{ v: "ink", name: "Black", color: INK }, { v: "tortoise", name: "Tortoiseshell", color: C.ochre }] },
+    { key: "hat", label: "Hat", type: "thumb", vb: "head", opts: [["none", "None"], ["cap", "Cap"], ["beanie", "Beanie"]] },
+    { key: "hat_color", label: "Hat color", type: "color", when: s => s.hat !== "none", opts: clothOpts(["terracotta", "brick", "mustard", "olive", "green", "indigo", "navy", "charcoal", "cream", "dustypink"]) },
+  ]},
+  { id: "clothes", label: "Clothes", groups: [
+    { key: "top_kind", label: "Top", type: "thumb", vb: "torso", opts: [["tee", "Tee"], ["sweater", "Sweater"], ["shirt", "Button-down"], ["cardigan", "Cardigan"], ["blazer", "Blazer"]] },
+    { key: "top", label: "Top color", type: "color", opts: clothOpts(ALL_CLOTH) },
+    { key: "inner", label: "Underneath", type: "color", when: s => s.top_kind === "cardigan" || s.top_kind === "blazer", opts: clothOpts(["white", "cream", "blush", "lilac", "mustard", "denim", "charcoal", "navy"]) },
+    { key: "bottom_kind", label: "Bottoms", type: "thumb", vb: "legs", opts: [["pants", "Trousers"], ["skirt", "Skirt"]] },
+    { key: "bottom", label: "Bottoms color", type: "color", opts: clothOpts(ALL_CLOTH) },
+    { key: "shoes", label: "Shoes", type: "color", opts: clothOpts(["charcoal", "brick", "ochre", "cream", "navy", "terracotta", "olive"]) },
+  ]},
+  { id: "carry", label: "What you carry", groups: [
+    { key: "item", label: "Carrying", type: "thumb", vb: "full", opts: [["tote", "Tote bag"], ["laptop", "Laptop"], ["book", "Book"], ["messenger", "Messenger bag"], ["folder", "Folder"], ["lanyard", "Lanyard"]] },
+    { key: "chair_color", label: "Wheelchair color", type: "color", when: s => s.mobility === "wheelchair", opts: clothOpts(["indigo", "green", "brick", "mustard", "ochre", "charcoal", "lilac"]) },
+  ]},
+];
+
+let state = load();
+let step = "body";
+function load() {
+  try { const s = JSON.parse(localStorage.getItem("campus-character-v2") || "null"); if (s) { if (s.beard === true) s.beard = "full"; if (s.beard === false) s.beard = "none"; return { ...DEFAULT, ...s }; } } catch (e) {}
+  return { ...DEFAULT };
+}
+function save() { try { localStorage.setItem("campus-character-v2", JSON.stringify(state)); } catch (e) {} }
+
+function optName(g, v) { const o = g.opts.find(o => (Array.isArray(o) ? o[0] : o.v) === v); return o ? (Array.isArray(o) ? o[1] : o.name) : ""; }
+function groupOf(key) { for (const s of STEPS) for (const g of s.groups) if (g.key === key) return g; }
+
+function describe(s) {
+  const sym = symbol(s.n), hc = optName(groupOf("hair_color"), s.hair_color).toLowerCase();
+  const hair = { short: `short ${hc} hair`, bob: `a ${hc} bob`, flip: `a flipped ${hc} bob`, long: `shoulder-length ${hc} hair`, curly: `curly ${hc} hair`, bun: `${hc} hair in a bun`, bald: "a bald head" }[s.hair];
+  const parts = [hair + ({ mustache: " and a mustache", full: " and a beard" }[s.beard] || "")];
+  if (s.glasses !== "none") parts.push(`${{ round: "round", rect: "rectangular", browline: "browline", cateye: "cat-eye" }[s.glasses]} ${s.glasses_color === "tortoise" ? "tortoiseshell " : ""}glasses`);
+  if (s.hat !== "none") parts.push(`a ${CLOTH_NAMES[s.hat_color].toLowerCase()} ${s.hat}`);
+  const topName = { tee: "tee", sweater: "sweater", shirt: "button-down shirt", cardigan: "cardigan", blazer: "blazer" }[s.top_kind];
+  let top = `${CLOTH_NAMES[s.top].toLowerCase()} ${topName}`;
+  if (s.top_kind === "cardigan" || s.top_kind === "blazer") top += ` over a ${CLOTH_NAMES[s.inner].toLowerCase()} top`;
+  parts.push(top, `${CLOTH_NAMES[s.bottom].toLowerCase()} ${s.bottom_kind === "skirt" ? "skirt" : "trousers"}`);
+  if (s.mobility === "wheelchair") parts.push("uses a wheelchair");
+  if (s.mobility === "cane") parts.push("walks with a cane");
+  const carry = { tote: "a tote bag", laptop: "a laptop", book: "a book", messenger: "a messenger bag", folder: "a folder", lanyard: "a lanyard badge" }[s.item];
+  const verb = s.item === "lanyard" ? "wearing" : s.mobility === "wheelchair" ? "with" : "carrying";
+  const tail = `${verb} ${carry}${s.mobility === "wheelchair" && s.item !== "lanyard" ? " on their lap" : ""} showing the ${sym.cname} ${sym.shape} ${s.n}`;
+  const who = s.name.trim() ? `${s.name.trim()}, player ${s.n}` : `Player ${s.n}`;
+  return `${who}: ${parts.join(", ")}, ${tail}.`;
+}
+
+const $ = sel => document.querySelector(sel);
+function renderStage() {
+  const desc = describe(state);
+  $("#figure").innerHTML = person(state, { label: desc });
+  $("#desc").textContent = desc;
+  const sym = symbol(state.n);
+  $("#badge").innerHTML = `<svg viewBox="0 0 44 44" width="44" height="44" aria-hidden="true">${badge(state.n, 22, 22, 32)}</svg>`;
+  $("#badge-text").textContent = `You're the ${sym.cname} ${sym.shape}, number ${state.n}.`;
+  save();
+}
+
+function thumb(g, v) {
+  const s = { ...state, [g.key]: v };
+  if (g.key === "glasses" || g.key === "glasses_color") { s.hat = "none"; s.beard = "none"; } // show the frames, not the hat or beard
+  return person(s, { viewBox: VB[g.vb], grain: false, shadow: false, tag: false });
+}
+
+function renderTabs() {
+  $("#tabs").innerHTML = STEPS.map(s => `<button role="tab" id="tab-${s.id}" aria-selected="${s.id === step}" aria-controls="panel" tabindex="${s.id === step ? 0 : -1}">${s.label}</button>`).join("");
+  $("#tabs").querySelectorAll("button").forEach((b, i) => {
+    b.onclick = () => { step = STEPS[i].id; renderTabs(); renderPanel(); };
+    b.onkeydown = e => {
+      const d = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0; if (!d) return;
+      const j = (i + d + STEPS.length) % STEPS.length; step = STEPS[j].id; renderTabs(); renderPanel(); $("#tab-" + step).focus();
+    };
+  });
+  $("#panel").setAttribute("aria-labelledby", "tab-" + step);
+}
+
+function renderPanel() {
+  const st = STEPS.find(s => s.id === step);
+  const html = st.groups.filter(g => !g.when || g.when(state)).map(g => {
+    const opts = g.opts.map(o => Array.isArray(o) ? { v: o[0], name: o[1] } : o);
+    const cur = state[g.key];
+    const items = opts.map((o, i) => {
+      const id = `opt-${g.key}-${i}`, checked = o.v === cur ? "checked" : "";
+      const vis = g.type === "color" ? `<span class="swatch" style="--c:${o.color}"></span>` : `<span class="thumb">${thumb(g, o.v)}</span>`;
+      return `<label class="opt ${g.type}" for="${id}"><input type="radio" id="${id}" name="${g.key}" data-i="${i}" ${checked}>${vis}<span class="oname">${o.name}</span></label>`;
+    }).join("");
+    const curName = (opts.find(o => o.v === cur) || {}).name || "";
+    return `<fieldset class="group"><legend><span class="glabel">${g.label}</span><span class="gcur">${curName}</span></legend><div class="opts ${g.type}">${items}</div></fieldset>`;
+  }).join("");
+  const panel = $("#panel");
+  panel.innerHTML = html + `<div class="randstep"><button type="button" class="ghost" id="rand-step">Shuffle just this step</button></div>`;
+  panel.querySelectorAll("input[type=radio]").forEach(inp => {
+    inp.onchange = () => {
+      const g = groupOf(inp.name), o = g.opts[+inp.dataset.i];
+      state[g.key] = Array.isArray(o) ? o[0] : o.v;
+      renderStage(); const f = inp.id; renderPanel(); const el = document.getElementById(f); if (el) el.focus();
+    };
+  });
+  $("#rand-step").onclick = () => { shuffle(st.groups); renderStage(); renderPanel(); };
+}
+
+const pick = a => a[Math.floor(Math.random() * a.length)];
+function shuffle(groups) {
+  groups.forEach(g => {
+    let opts = g.opts.map(o => Array.isArray(o) ? o[0] : o.v);
+    if (g.key === "mobility") opts = ["standing", "standing", "standing", "wheelchair", "cane"];
+    if (g.key === "glasses") opts = ["none", "none", "round", "rect", "browline", "cateye"];
+    if (g.key === "hat") opts = ["none", "none", "none", "cap", "beanie"];
+    if (g.key === "beard") opts = ["none", "none", "none", "mustache", "full"];
+    state[g.key] = pick(opts);
+  });
+  if (state.top === state.bottom) state.bottom = pick(["khaki", "denim", "charcoal", "navy", "olive"]);
+}
+
+async function exportPng() {
+  const btn = $("#download"), status = $("#status");
+  btn.disabled = true; status.textContent = "Preparing your image…";
+  try {
+    const EW = VIEW.w * 3, EH = VIEW.h * 3;
+    const svg = person(state, { width: EW, height: EH, label: describe(state), shadow: false });
+    const img = new Image();
+    const url = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml" }));
+    await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = url; });
+    const cv = document.createElement("canvas"); cv.width = EW; cv.height = EH;
+    cv.getContext("2d").drawImage(img, 0, 0, EW, EH); URL.revokeObjectURL(url);
+    const blob = await new Promise(r => cv.toBlob(r, "image/png"));
+    const safe = state.name.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    const filename = `commons-player-${state.n}${safe ? "-" + safe : ""}.png`;
+    const r = await saveFile(blob, filename);
+    status.textContent = r === "declined" ? "Download cancelled." : `Saved ${filename}. Next: add it to the game and paste in the alt text.`;
+  } catch (e) {
+    status.textContent = "That didn't work in this browser. Try again, or take a screenshot of the character.";
+  } finally { btn.disabled = false; }
+}
+
+let dlPromise = null;
+function downloadsCap() {
+  if (!dlPromise) dlPromise = (window.claude && window.claude.use) ? window.claude.use("downloads").catch(() => null) : Promise.resolve(null);
+  return dlPromise;
+}
+async function saveFile(blob, filename) {
+  const dl = await downloadsCap();
+  if (dl) {
+    try { await dl.save({ filename, data: blob }); return "saved"; }
+    catch (e) { if (e && e.code === "declined") return "declined"; }
+  }
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  return "saved";
+}
+
+async function copyDesc() {
+  const text = describe(state), status = $("#status");
+  try { await navigator.clipboard.writeText(text); status.textContent = "Alt text copied."; }
+  catch (e) {
+    const r = document.createRange(); r.selectNodeContents($("#desc")); const s = getSelection(); s.removeAllRanges(); s.addRange(r);
+    status.textContent = "Alt text selected. Press Ctrl+C (or Cmd+C) to copy.";
+  }
+}
+
+function init() {
+  const sel = $("#number");
+  sel.innerHTML = Array.from({ length: 20 }, (_, i) => { const n = i + 1, s = symbol(n); return `<option value="${n}">${n} · ${s.cname} ${s.shape}</option>`; }).join("");
+  sel.value = state.n;
+  sel.onchange = () => { state.n = +sel.value; renderStage(); renderPanel(); };
+  const nm = $("#name"); nm.value = state.name;
+  nm.oninput = () => { state.name = nm.value.slice(0, 20); renderStage(); };
+  const sn = $("#showname"); sn.checked = state.show_name !== false;
+  sn.onchange = () => { state.show_name = sn.checked; renderStage(); };
+  $("#surprise").onclick = () => { STEPS.forEach(s => shuffle(s.groups)); renderStage(); renderPanel(); $("#status").textContent = "New character. Keep shuffling, or tweak any step."; };
+  $("#reset").onclick = () => { const { n, name } = state; state = { ...DEFAULT, n, name }; renderStage(); renderPanel(); $("#status").textContent = "Back to the starting character."; };
+  $("#download").onclick = exportPng;
+  $("#copy").onclick = copyDesc;
+  renderTabs(); renderPanel(); renderStage();
+}
+init();
+
+</script>
+
+</body>
+</html>
